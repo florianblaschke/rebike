@@ -1,0 +1,9 @@
+[package]
+name = "importer-rebike"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+quick-xml = "0.38.4"
+reqwest = "0.12.26"
+tokio = "1.48.0"
