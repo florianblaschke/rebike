@@ -1,7 +1,6 @@
+use chrono::{DateTime, Utc};
 use serde::Serialize;
 use std::collections::HashMap;
-
-use chrono::{DateTime, Utc};
 
 #[derive(Debug, Serialize)]
 struct LanguageDetailsString {
@@ -58,7 +57,20 @@ pub struct Job {
 
 impl TryFrom<&HashMap<String, String>> for Job {
     type Error = String;
+
     fn try_from(map: &HashMap<String, String>) -> Result<Self, String> {
+        let mut description = get_value("jobDescriptions.jobDescription.name", map)?;
+        description.push_str(&get_value("jobDescriptions.jobDescription.value", map)?);
+
+        let mut responsibilities = get_value("jobDescriptions.jobDescription.1.name", map)?;
+        responsibilities.push_str(&get_value("jobDescriptions.jobDescription.1.value", map)?);
+
+        let mut requirements = get_value("jobDescriptions.jobDescription.2.name", map)?;
+        requirements.push_str(&get_value("jobDescriptions.jobDescription.2.value", map)?);
+
+        let mut benefits = get_value("jobDescriptions.jobDescription.3.name", map)?;
+        benefits.push_str(&get_value("jobDescriptions.jobDescription.3.value", map)?);
+
         let job = Job {
             //hardcode tenant_id
             tenant_id: "12345".to_string(),
@@ -72,7 +84,7 @@ impl TryFrom<&HashMap<String, String>> for Job {
             },
             description: MultiLanguageObj {
                 de: LanguageDetailsString {
-                    custom: Some(get_value("jobDescriptions.jobDescription", map)?),
+                    custom: Some(description),
                     default: None,
                 },
             },
@@ -91,7 +103,7 @@ impl TryFrom<&HashMap<String, String>> for Job {
             public_id: "12345".to_string(),
             slug: MultiLanguageObj {
                 de: LanguageDetailsString {
-                    custom: Some(get_value("name", map)?),
+                    custom: Some(get_value("name", map)?.to_lowercase().replace(" ", "-")),
                     default: None,
                 },
             },
@@ -100,19 +112,19 @@ impl TryFrom<&HashMap<String, String>> for Job {
             created_by: "rebike-importer".to_string(),
             benefits: MultiLanguageObj {
                 de: LanguageDetailsVec {
-                    custom: None,
+                    custom: Some(vec![benefits]),
                     default: None,
                 },
             },
             requirements: MultiLanguageObj {
                 de: LanguageDetailsVec {
-                    custom: None,
+                    custom: Some(vec![requirements]),
                     default: None,
                 },
             },
             responsibilities: MultiLanguageObj {
                 de: LanguageDetailsVec {
-                    custom: None,
+                    custom: Some(vec![responsibilities]),
                     default: None,
                 },
             },
