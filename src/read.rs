@@ -18,6 +18,7 @@ pub fn read_steam(
     let mut count = 0;
     let mut path_parts = Vec::new();
     let mut map = HashMap::new();
+    let mut element_counts = HashMap::<String, u32>::new();
     let mut jobs = Vec::new();
 
     loop {
@@ -30,18 +31,33 @@ pub fn read_steam(
                     continue;
                 }
                 if e.name().as_ref() == b"position" {
-                    // Count the jobs
                     count += 1;
-                    // position signals a new job, so push the last map into an array
                     if !map.is_empty() {
                         jobs.push(map);
-                        // create a new hash for the next jop
                         map = HashMap::new();
                     }
+                    path_parts.clear();
+                    element_counts.clear();
                     continue;
                 }
+
                 let elem_name = String::from_utf8(e.name().as_ref().to_owned())?;
-                path_parts.push(elem_name);
+
+                let parent_path = path_parts.join(".");
+                let context_key = if parent_path.is_empty() {
+                    elem_name.clone()
+                } else {
+                    format!("{}.{}", parent_path, elem_name)
+                };
+
+                let current_count = *element_counts.get(&context_key).unwrap_or(&0);
+                element_counts.insert(context_key, current_count + 1);
+
+                if current_count > 0 {
+                    path_parts.push(format!("{}.{}", elem_name, current_count));
+                } else {
+                    path_parts.push(elem_name);
+                }
             }
             Ok(Event::CData(e)) => {
                 let text = e.decode()?.trim().to_string();
@@ -51,7 +67,7 @@ pub fn read_steam(
                 }
             }
             Ok(Event::Text(e)) => {
-                let text = e.decode()?.to_string();
+                let text = e.decode()?.trim().to_string();
                 if !text.is_empty() && !path_parts.is_empty() {
                     let full_path = path_parts.join(".");
                     map.insert(full_path, text);
@@ -126,6 +142,38 @@ mod test {
         assert_eq!(
             map.get("name").unwrap().to_owned(),
             "The name is John Cena.".to_string()
+        );
+    }
+
+    #[test]
+    fn test_read_double_keys() {
+        let txt = r#"<position>
+                        <jobDescriptions>
+                            <jobDescription>
+                                <name>First</name>
+                                <value>First Value</value>
+                            </jobDescription>
+                            <jobDescription>
+                                <name>Second</name>
+                                <value>Second Value</value>
+                            </jobDescription>
+                        </jobDescriptions>
+                    </position>"#;
+
+        let jobs = read_steam(txt).unwrap();
+        let map = jobs[0].clone();
+
+        assert_eq!(
+            map.get("jobDescriptions.jobDescription.name")
+                .unwrap()
+                .to_owned(),
+            "First".to_string()
+        );
+        assert_eq!(
+            map.get("jobDescriptions.jobDescription.1.name")
+                .unwrap()
+                .to_owned(),
+            "Second".to_string()
         );
     }
 }
