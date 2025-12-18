@@ -3,7 +3,7 @@ use mongodb::{
     sync::{Client, Collection},
 };
 
-pub fn job_collection() -> Result<Collection<Document>, Box<dyn std::error::Error>> {
+pub fn _job_collection() -> Result<Collection<Document>, Box<dyn std::error::Error>> {
     let monogo_uri = std::env::var("MONGO_URI").expect("MONGO_URI must be set");
 
     let client = Client::with_uri_str(monogo_uri)?;
