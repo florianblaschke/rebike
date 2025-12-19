@@ -2,6 +2,8 @@ use chrono::{DateTime, Utc};
 use serde::Serialize;
 use std::collections::HashMap;
 
+use crate::html::get_li_items;
+
 #[derive(Debug, Serialize)]
 struct LanguageDetailsString {
     custom: Option<String>,
@@ -52,24 +54,23 @@ pub struct Job {
     benefits: MultiLanguageObj<LanguageDetailsVec>,
     requirements: MultiLanguageObj<LanguageDetailsVec>,
     responsibilities: MultiLanguageObj<LanguageDetailsVec>,
-    recruiter_ids: Vec<String>,
+    recruiter_ids: Option<Vec<String>>,
 }
 
 impl TryFrom<&HashMap<String, String>> for Job {
-    type Error = String;
+    type Error = Box<dyn std::error::Error>;
 
-    fn try_from(map: &HashMap<String, String>) -> Result<Self, String> {
+    fn try_from(map: &HashMap<String, String>) -> Result<Self, Box<dyn std::error::Error>> {
         let mut description = get_value("jobDescriptions.jobDescription.name", map)?;
         description.push_str(&get_value("jobDescriptions.jobDescription.value", map)?);
 
-        let mut responsibilities = get_value("jobDescriptions.jobDescription.1.name", map)?;
-        responsibilities.push_str(&get_value("jobDescriptions.jobDescription.1.value", map)?);
+        let responsibilities =
+            get_li_items(&get_value("jobDescriptions.jobDescription.1.value", map)?)?;
 
-        let mut requirements = get_value("jobDescriptions.jobDescription.2.name", map)?;
-        requirements.push_str(&get_value("jobDescriptions.jobDescription.2.value", map)?);
+        let requirements =
+            get_li_items(&get_value("jobDescriptions.jobDescription.2.value", map)?)?;
 
-        let mut benefits = get_value("jobDescriptions.jobDescription.3.name", map)?;
-        benefits.push_str(&get_value("jobDescriptions.jobDescription.3.value", map)?);
+        let benefits = get_li_items(&get_value("jobDescriptions.jobDescription.3.value", map)?)?;
 
         let job = Job {
             //hardcode tenant_id
@@ -112,23 +113,23 @@ impl TryFrom<&HashMap<String, String>> for Job {
             created_by: "rebike-importer".to_string(),
             benefits: MultiLanguageObj {
                 de: LanguageDetailsVec {
-                    custom: Some(vec![benefits]),
+                    custom: Some(benefits),
                     default: None,
                 },
             },
             requirements: MultiLanguageObj {
                 de: LanguageDetailsVec {
-                    custom: Some(vec![requirements]),
+                    custom: Some(requirements),
                     default: None,
                 },
             },
             responsibilities: MultiLanguageObj {
                 de: LanguageDetailsVec {
-                    custom: Some(vec![responsibilities]),
+                    custom: Some(responsibilities),
                     default: None,
                 },
             },
-            recruiter_ids: vec!["12345".to_string()],
+            recruiter_ids: None,
         };
 
         Ok(job)
