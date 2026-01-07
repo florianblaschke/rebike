@@ -153,19 +153,19 @@ impl TryFrom<&HashMap<String, String>> for Job {
             created_by: "rebike-importer".to_string(),
             benefits: MultiLanguageObj {
                 de: LanguageDetailsVec {
-                    custom: Some(benefits),
+                    custom: Some(clean_list_items(benefits)?),
                     default: None,
                 },
             },
             requirements: MultiLanguageObj {
                 de: LanguageDetailsVec {
-                    custom: Some(requirements),
+                    custom: Some(clean_list_items(requirements)?),
                     default: None,
                 },
             },
             responsibilities: MultiLanguageObj {
                 de: LanguageDetailsVec {
-                    custom: Some(responsibilities),
+                    custom: Some(clean_list_items(responsibilities)?),
                     default: None,
                 },
             },
@@ -175,6 +175,17 @@ impl TryFrom<&HashMap<String, String>> for Job {
 
         Ok(job)
     }
+}
+
+fn clean_list_items(items: Vec<String>) -> Result<Vec<String>, Box<dyn std::error::Error>> {
+    let mut cleaned_items = Vec::new();
+
+    for item in items {
+        let cleaned = filter_out_tags(&item)?;
+        cleaned_items.push(cleaned);
+    }
+
+    Ok(cleaned_items)
 }
 
 fn get_value(key: &str, map: &HashMap<String, String>) -> Result<String, String> {

@@ -18,16 +18,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         all_jobs.push(j);
     }
 
-    // let collection = connect::job_collection()?;
-    // let result = collection.insert_many(all_jobs).run()?;
-    // println!("Inserted documents with _ids:");
-    // for (_key, value) in &result.inserted_ids {
-    //     println!("{}", value);
-    // }
-    let _ = fs::write(
-        "src/output/jobs.json",
-        serde_json::to_string_pretty(&all_jobs)?,
-    );
+    let collection = connect::job_collection()?;
+    let result = collection.insert_many(all_jobs).run()?;
+    println!("Inserted documents with _ids:");
+    for (_key, value) in &result.inserted_ids {
+        println!("{}", value);
+    }
+    // let _ = fs::write(
+    //     "src/output/jobs.json",
+    //     serde_json::to_string_pretty(&all_jobs)?,
+    // );
 
     Ok(())
 }
