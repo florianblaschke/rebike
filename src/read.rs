@@ -4,12 +4,12 @@ use std::collections::HashMap;
 
 pub fn rebike_personio() -> Result<Vec<HashMap<String, String>>, Box<dyn std::error::Error>> {
     let xml = reqwest::blocking::get("https://rebike-mobility.jobs.personio.de/xml")?.text()?;
-    let jobs = read_steam(&xml)?;
+    let jobs = read_stream(&xml)?;
 
     Ok(jobs)
 }
 
-pub fn read_steam(
+pub fn read_stream(
     xml_feed: &str,
 ) -> Result<Vec<HashMap<String, String>>, Box<dyn std::error::Error>> {
     let mut reader = Reader::from_str(xml_feed);
@@ -101,7 +101,7 @@ mod test {
                         <name>IT</name>
                     </position>"#;
 
-        let jobs = read_steam(txt).unwrap();
+        let jobs = read_stream(txt).unwrap();
         let map = jobs[0].clone();
 
         assert_eq!(map.get("name").unwrap().to_owned(), "IT".to_string())
@@ -117,7 +117,7 @@ mod test {
                         </location>
                     </position>"#;
 
-        let jobs = read_steam(txt).unwrap();
+        let jobs = read_stream(txt).unwrap();
         let map = jobs[0].clone();
 
         assert_eq!(
@@ -136,7 +136,7 @@ mod test {
                         <name><![CDATA[ The name is John Cena. ]]></name>
                     </position>"#;
 
-        let jobs = read_steam(txt).unwrap();
+        let jobs = read_stream(txt).unwrap();
         let map = jobs[0].clone();
 
         assert_eq!(
@@ -160,7 +160,7 @@ mod test {
                         </jobDescriptions>
                     </position>"#;
 
-        let jobs = read_steam(txt).unwrap();
+        let jobs = read_stream(txt).unwrap();
         let map = jobs[0].clone();
 
         assert_eq!(
