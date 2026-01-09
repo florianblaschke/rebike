@@ -1,10 +1,9 @@
-use chrono::Utc;
 use mongodb::bson::DateTime;
 use mongodb::bson::oid::ObjectId;
 use serde::Serialize;
 use std::collections::HashMap;
 
-use crate::html::{filter_out_tags, get_li_items};
+use super::html::{filter_out_tags, get_li_items};
 
 #[derive(Debug, Serialize)]
 struct LanguageDetailsString {
@@ -199,7 +198,7 @@ fn get_value(key: &str, map: &HashMap<String, String>) -> Result<String, String>
 
 #[cfg(test)]
 mod test {
-    use crate::read::rebike_personio;
+    use crate::xml::rebike_personio;
 
     use super::*;
 

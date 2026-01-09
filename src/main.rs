@@ -1,12 +1,4 @@
-mod connect;
-mod html;
-mod job;
-mod read;
-
-use std::fs;
-
-use job::Job;
-use read::rebike_personio;
+use importer_rebike::{db, job::def::Job, xml::rebike_personio};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     dotenvy::dotenv()?;
@@ -18,7 +10,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         all_jobs.push(j);
     }
 
-    let collection = connect::job_collection()?;
+    let collection = db::job_collection()?;
     let result = collection.insert_many(all_jobs).run()?;
     println!("Inserted documents with _ids:");
     for (_key, value) in &result.inserted_ids {

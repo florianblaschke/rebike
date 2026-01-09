@@ -3,6 +3,13 @@ name = "importer-rebike"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "rebike"
+path = "src/main.rs"
+
 [dependencies]
 chrono = { version = "0.4.42", features = [ "serde"]}
 cuid = "1.3.3"

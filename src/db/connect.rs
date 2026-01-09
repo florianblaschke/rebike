@@ -1,6 +1,6 @@
 use mongodb::sync::{Client, Collection};
 
-use crate::job::Job;
+use crate::job::def::Job;
 
 pub fn job_collection() -> Result<Collection<Job>, Box<dyn std::error::Error>> {
     let monogo_uri = std::env::var("MONGO_URI").expect("MONGO_URI must be set");
