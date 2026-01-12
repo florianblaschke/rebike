@@ -21,7 +21,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .run()?;
     let result = collection.insert_many(all_jobs).run()?;
     for id in result.inserted_ids {
-        println!("inserted job with id: {:?}", id);
+        println!("inserted job with id: {:?}", id.1);
     }
     Ok(())
 }
