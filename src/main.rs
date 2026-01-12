@@ -1,4 +1,5 @@
 use importer_rebike::{config::get_configuration, db, job::def::Job, xml::read};
+use mongodb::bson::doc;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = get_configuration().expect("unable to read configuration");
@@ -6,20 +7,21 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut all_jobs = Vec::new();
     for job in jobs {
-        let j = Job::try_from(&job)?;
-        all_jobs.push(j);
+        match Job::try_from(&job) {
+            Ok(j) => {
+                all_jobs.push(j);
+            }
+            Err(s) => println!("could not create job: {}", s),
+        };
     }
 
     let collection = db::job_collection(&config.db.uri)?;
+    collection
+        .delete_many(doc! { "createdBy": "rebike-importer" })
+        .run()?;
     let result = collection.insert_many(all_jobs).run()?;
-    println!("Inserted documents with _ids:");
-    for (_key, value) in &result.inserted_ids {
-        println!("{}", value);
+    for id in result.inserted_ids {
+        println!("inserted job with id: {:?}", id);
     }
-    // let _ = fs::write(
-    //     "src/output/jobs.json",
-    //     serde_json::to_string_pretty(&all_jobs)?,
-    // );
-
     Ok(())
 }

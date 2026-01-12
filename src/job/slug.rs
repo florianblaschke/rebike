@@ -17,7 +17,6 @@ pub fn format_slug(input: &str) -> Result<String, Box<dyn std::error::Error>> {
         slug.push_str(char);
     }
     let stripped_replacement = slug.replace("|", "");
-    println!("SLUG: {}", slug);
     let cleaned = regex.replace_all(&stripped_replacement, "-");
     Ok(cleaned.to_string())
 }
