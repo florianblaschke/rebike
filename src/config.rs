@@ -1,27 +1,27 @@
 use serde::Deserialize;
 
 #[derive(Deserialize)]
-struct ATS {
-    endpoint: String,
+pub struct ATS {
+    pub endpoint: String,
 }
 
 #[derive(Deserialize)]
-struct Database {
-    uri: String,
+pub struct Database {
+    pub uri: String,
 }
 
 #[derive(Deserialize)]
-struct Configuration {
-    ats: ATS,
-    db: Database,
+pub struct Configuration {
+    pub ats: ATS,
+    pub db: Database,
 }
 
 pub fn get_configuration() -> Result<Configuration, config::ConfigError> {
     let configuration_builder = config::Config::builder()
         .add_source(
             config::Environment::with_prefix("APP")
-                .prefix_separator("__")
-                .separator("_"),
+                .prefix_separator("_")
+                .separator("__"),
         )
         .build()?;
 
