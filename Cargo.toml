@@ -14,7 +14,6 @@ path = "src/main.rs"
 chrono = { version = "0.4.42", features = [ "serde"]}
 config = "0.15.19"
 cuid = "1.3.3"
-dotenvy = "0.15.7"
 mongodb = {version = "3.4.1", features = ["sync"]}
 quick-xml = "0.38.4"
 regex = "1.12.2"
