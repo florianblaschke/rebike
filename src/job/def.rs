@@ -3,6 +3,8 @@ use mongodb::bson::oid::ObjectId;
 use serde::Serialize;
 use std::collections::HashMap;
 
+use crate::job::slug::format_slug;
+
 use super::html::{filter_out_tags, get_li_items};
 
 #[derive(Debug, Serialize)]
@@ -138,12 +140,7 @@ impl TryFrom<&HashMap<String, String>> for Job {
             public_id: cuid::cuid2_slug(),
             slug: MultiLanguageObj {
                 de: LanguageDetailsString {
-                    custom: Some(
-                        get_value("name", map)?
-                            .to_lowercase()
-                            .replace(" ", "-")
-                            .replace("/", "-"),
-                    ),
+                    custom: Some(format_slug(&get_value("name", map)?)?),
                     default: None,
                 },
             },
@@ -194,19 +191,4 @@ fn get_value(key: &str, map: &HashMap<String, String>) -> Result<String, String>
     };
 
     Ok(value)
-}
-
-#[cfg(test)]
-mod test {
-    use crate::xml::rebike_personio;
-
-    use super::*;
-
-    #[test]
-    fn rebike_create_job() {
-        let feed = rebike_personio().unwrap();
-        let job = Job::try_from(&feed[0].clone()).unwrap();
-
-        println!("{:?}", job);
-    }
 }

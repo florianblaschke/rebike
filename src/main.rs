@@ -1,8 +1,8 @@
-use importer_rebike::{config::get_configuration, db, job::def::Job, xml::xml_feed};
+use importer_rebike::{config::get_configuration, db, job::def::Job, xml::read};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = get_configuration().expect("unable to read configuration");
-    let jobs = xml_feed(&config.ats.endpoint)?;
+    let jobs = read(&config.ats.endpoint)?;
 
     let mut all_jobs = Vec::new();
     for job in jobs {

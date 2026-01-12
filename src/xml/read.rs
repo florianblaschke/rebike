@@ -2,7 +2,7 @@ use quick_xml::events::Event;
 use quick_xml::reader::Reader;
 use std::collections::HashMap;
 
-pub fn xml_feed(url: &str) -> Result<Vec<HashMap<String, String>>, Box<dyn std::error::Error>> {
+pub fn read(url: &str) -> Result<Vec<HashMap<String, String>>, Box<dyn std::error::Error>> {
     let xml = reqwest::blocking::get(url)?.text()?;
     let jobs = read_stream(&xml)?;
 
