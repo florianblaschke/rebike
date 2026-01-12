@@ -1,7 +1,6 @@
 use importer_rebike::{db, job::def::Job, xml::rebike_personio};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    dotenvy::dotenv()?;
     let jobs = rebike_personio()?;
 
     let mut all_jobs = Vec::new();
